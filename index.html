@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: rgb(160, 221, 216);
+        }
+
+        .board {
+            width: 300px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            font-size: 40px;
+            line-height: 100px;
+            cursor: pointer;
+            background-color: darkslateblue;
+            color: white;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color:lightpink;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Tic Tac Toe</h1>
+
+<h3>Select Game Mode</h3>
+<button onclick="setMode('PVP')">Player1 vs Player2</button>
+<button onclick="setMode('AI')">Player vs AI</button>
+
+<h3 id="modeText"></h3>
+
+<div class="board">
+    <div class="cell" onclick="play(0)"></div>
+    <div class="cell" onclick="play(1)"></div>
+    <div class="cell" onclick="play(2)"></div>
+
+    <div class="cell" onclick="play(3)"></div>
+    <div class="cell" onclick="play(4)"></div>
+    <div class="cell" onclick="play(5)"></div>
+
+    <div class="cell" onclick="play(6)"></div>
+    <div class="cell" onclick="play(7)"></div>
+    <div class="cell" onclick="play(8)"></div>
+</div>
+
+<h2 id="result"></h2>
+
+<button onclick="resetGame()">Reset Game</button>
+
+<script>
+    let cells = document.getElementsByClassName("cell");
+    let currentPlayer = "X";
+    let gameOver = false;
+    let mode = "";
+
+    let winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+    ];
+
+    function setMode(selectedMode) {
+        mode = selectedMode;
+        resetGame();
+
+        if (mode === "PVP") {
+            document.getElementById("modeText").innerHTML = "Mode: Player vs Player";
+        } else {
+            document.getElementById("modeText").innerHTML = "Mode: Player vs AI (You are X)";
+        }
+    }
+
+    function play(index) {
+        if (cells[index].innerHTML !== "" || gameOver || mode === "") {
+            return;
+        }
+
+        cells[index].innerHTML = currentPlayer;
+        checkWinner();
+
+        if (gameOver) return;
+
+        if (mode === "AI" && currentPlayer === "X") {
+            currentPlayer = "O";
+            setTimeout(aiMove, 300);
+        } else {
+            currentPlayer = (currentPlayer === "X") ? "O" : "X";
+        }
+    }
+
+    function aiMove() {
+        let emptyCells = [];
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i].innerHTML === "") {
+                emptyCells.push(i);
+            }
+        }
+
+        if (emptyCells.length > 0) {
+            let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            cells[randomIndex].innerHTML = "O";
+            checkWinner();
+            currentPlayer = "X";
+        }
+    }
+
+    function checkWinner() {
+        for (let pattern of winPatterns) {
+            let a = cells[pattern[0]].innerHTML;
+            let b = cells[pattern[1]].innerHTML;
+            let c = cells[pattern[2]].innerHTML;
+
+            if (a !== "" && a === b && b === c) {
+                document.getElementById("result").innerHTML ="player "+ a + " Wins!";
+                gameOver = true;
+                return;
+            }
+        }
+
+        let draw = true;
+        for (let cell of cells) {
+            if (cell.innerHTML === "") {
+                draw = false;
+            }
+        }
+
+        if (draw) {
+            document.getElementById("result").innerHTML = "Draw!";
+            gameOver = true;
+        }
+    }
+
+    function resetGame() {
+        for (let cell of cells) {
+            cell.innerHTML = "";
+        }
+        currentPlayer = "X";
+        gameOver = false;
+        document.getElementById("result").innerHTML = "";
+    }
+</script>
+
+</body>
+</html>
